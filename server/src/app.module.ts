@@ -5,16 +5,19 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserEntity } from './users/entity/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { MessagesModule } from './messages/messages.module';
+import { MessageEntity } from './messages/entity/message.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './tmp/db',
-      entities: [UserEntity],
+      entities: [UserEntity, MessageEntity],
       synchronize: true,
     }),
     AuthModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
