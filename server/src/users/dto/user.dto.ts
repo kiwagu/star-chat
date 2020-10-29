@@ -1,10 +1,18 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 /**
  * The UserDto is used when you want to return the User information
  */
 export class UserDto {
-  @IsNotEmpty() id: string;
-  @IsNotEmpty() username: string;
-  @IsNotEmpty() @IsEmail() email: string;
+  @IsNotEmpty()
+  @IsString()
+  readonly id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly username: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  readonly email: string;
 }

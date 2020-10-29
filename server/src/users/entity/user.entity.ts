@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 @Entity('user')
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid') id: string;
+
   @Column({
     type: 'varchar',
     nullable: false,
@@ -14,6 +15,7 @@ export class UserEntity {
   @Column({
     type: 'varchar',
     nullable: false,
+    select: false,
   })
   password: string;
 

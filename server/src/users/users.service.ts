@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { FindOneOptions, Repository } from 'typeorm';
 
-import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/user-login.dto';
 import { UserDto } from './dto/user.dto';
@@ -15,13 +15,26 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async findOne(options?: Record<string, unknown>): Promise<UserDto> {
-    const { id, username, email } = await this.userRepository.findOne(options);
-    return { id, username, email };
+  async findOne(options?: FindOneOptions<UserEntity>): Promise<UserDto> {
+    const user = await this.userRepository.findOne(options);
+
+    if (!user) return null;
+
+    const { hashPassword, password, ...userDTO } = user;
+
+    return userDTO;
   }
 
+  async findAll(): Promise<UserDto[]> {
+    return await this.userRepository.find({
+      select: ['id', 'username', 'email'],
+    });
+  }
   async findByLogin({ username, password }: LoginUserDto): Promise<UserDto> {
-    const user = await this.userRepository.findOne({ where: { username } });
+    const user = await this.userRepository.findOne({
+      select: ['id', 'email', 'password', 'username'],
+      where: { username },
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
@@ -32,7 +45,7 @@ export class UsersService {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    const { password: pass, hashPassword, ...userDto } = user;
+    const { password: pass, ...userDto } = user;
 
     return userDto;
   }

@@ -1,9 +1,14 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 /**
  * the LoginUserDto class that the application uses to verify the user’s credentials when they are trying to login
  */
 export class LoginUserDto {
-  @IsNotEmpty() readonly username: string;
-  @IsNotEmpty() readonly password: string;
+  @IsNotEmpty()
+  @IsString()
+  readonly username: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly password: string;
 }
