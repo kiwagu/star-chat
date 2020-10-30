@@ -5,6 +5,7 @@ import { Container } from 'react-bootstrap';
 import './App.scss';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
+import Login from './pages/Login';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <BrowserRouter>
         <Switch>
           <Route exact path="/" component={Register} />
+          <Route exact path="/login" component={Login} />
           <Route component={NotFound} />
         </Switch>
       </BrowserRouter>

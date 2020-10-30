@@ -1,10 +1,11 @@
 import React, { FormEvent, useState } from 'react';
 import { Row, Col, Form, Button } from 'react-bootstrap';
-import AlertError from '../components/AlertError';
+import { RouteComponentProps, Link } from 'react-router-dom';
 
+import AlertError from '../components/AlertError';
 import { SERVER_URL } from '../consts';
 
-export default function Register() {
+export default function Register(props: RouteComponentProps<any>) {
   const initialsFormsVariables = {
     email: '',
     username: '',
@@ -34,6 +35,7 @@ export default function Register() {
 
         setFormVariables(initialsFormsVariables);
         setIsShowError(false);
+        props.history.push('/login');
       })
       .catch((errors) => {
         setError(typeof errors === 'string' ? [errors] : errors);
@@ -97,6 +99,10 @@ export default function Register() {
               Register
             </Button>
           </div>
+          <br />
+          <small>
+            Already have an account? <Link to="/login">Login</Link>
+          </small>
         </Form>
       </Col>
     </Row>
