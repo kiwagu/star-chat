@@ -4,6 +4,7 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 
 import AlertError from '../components/AlertError';
 import { SERVER_URL } from '../consts';
+import { useAuthDispatch } from '../context/auth';
 
 export default function Login(props: RouteComponentProps<any>) {
   const initialsFormsVariables = {
@@ -13,6 +14,7 @@ export default function Login(props: RouteComponentProps<any>) {
   const [formsVariables, setFormVariables] = useState(initialsFormsVariables);
   const [errors, setError] = useState([]);
   const [isShowError, setIsShowError] = useState(false);
+  const dispatch = useAuthDispatch();
   const submitLoginForm = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -31,11 +33,10 @@ export default function Login(props: RouteComponentProps<any>) {
           return Promise.reject(error);
         }
 
-        localStorage.setItem('accessToken', data.accessToken);
-
+        dispatch({ type: 'LOGIN', payload: data });
         setFormVariables(initialsFormsVariables);
         setIsShowError(false);
-        props.history.push('/home');
+        props.history.push('/');
       })
       .catch((errors) => {
         setError(typeof errors === 'string' ? [errors] : errors);
@@ -82,7 +83,7 @@ export default function Login(props: RouteComponentProps<any>) {
           </div>
           <br />
           <small>
-            Do not have an account? <Link to="/register">Login</Link>
+            Do not have an account? <Link to="/register">Register</Link>
           </small>
         </Form>
       </Col>
