@@ -1,9 +1,11 @@
 import React, { createContext, useReducer, useContext } from 'react';
+import jwtDecode from 'jwt-decode';
 
 export type Payloud = {
   accessToken: string;
+  username: string;
   [key: string]: string;
-} & { message: string };
+} & { message?: string };
 type Action =
   | {
       type: 'LOGIN';
@@ -19,6 +21,22 @@ type Dispatch = (action: Action) => void;
 const AuthStateContext = createContext<State | undefined>(undefined);
 const AuthDispatchContext = createContext<Dispatch | undefined>(undefined);
 
+let credentials: Payloud | null = null;
+const token = localStorage.getItem('accessToken');
+if (token) {
+  const decodedToken: { exp: number; username: string } = jwtDecode(token);
+  const expiresAt = new Date(decodedToken.exp * 1000);
+
+  if (new Date() > expiresAt) {
+    localStorage.removeItem('accessToken');
+  } else {
+    credentials = {
+      accessToken: token,
+      username: decodedToken.username,
+    };
+  }
+}
+
 const authReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'LOGIN':
@@ -28,6 +46,7 @@ const authReducer = (state: State, action: Action): State => {
         credentials: action.payload,
       };
     case 'LOGOUT':
+      localStorage.removeItem('accessToken');
       return {
         ...state,
         credentials: null,
@@ -38,7 +57,7 @@ const authReducer = (state: State, action: Action): State => {
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [state, dispatch] = useReducer(authReducer, { credentials: null });
+  const [state, dispatch] = useReducer(authReducer, { credentials });
 
   return (
     <AuthDispatchContext.Provider value={dispatch}>
