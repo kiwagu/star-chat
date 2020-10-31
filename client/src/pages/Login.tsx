@@ -4,7 +4,7 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 
 import AlertError from '../components/AlertError';
 import { SERVER_URL } from '../consts';
-import { useAuthDispatch } from '../context/auth';
+import { Payloud, useAuthDispatch } from '../context/auth';
 
 export default function Login(props: RouteComponentProps<any>) {
   const initialsFormsVariables = {
@@ -24,7 +24,7 @@ export default function Login(props: RouteComponentProps<any>) {
       headers: { 'Content-Type': 'application/json' },
     })
       .then(async (response) => {
-        const data = await response.json();
+        const data: Payloud = await response.json();
 
         // check for error response
         if (!response.ok) {

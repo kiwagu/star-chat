@@ -1,13 +1,17 @@
 import React, { createContext, useReducer, useContext } from 'react';
 
-type Payloud = {
+export type Payloud = {
   accessToken: string;
   [key: string]: string;
-};
-type Action = {
-  type: 'LOGIN' | 'LOGOUT';
-  payload: Payloud;
-};
+} & { message: string };
+type Action =
+  | {
+      type: 'LOGIN';
+      payload: Payloud;
+    }
+  | {
+      type: 'LOGOUT';
+    };
 type State = { credentials: Payloud | null };
 type AuthProviderProps = { children: React.ReactNode };
 type Dispatch = (action: Action) => void;
@@ -29,7 +33,7 @@ const authReducer = (state: State, action: Action): State => {
         credentials: null,
       };
     default:
-      throw new Error(`Unknown action type: ${action.type}`);
+      throw new Error(`Unknown action: ${action}`);
   }
 };
 
