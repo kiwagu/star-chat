@@ -1,6 +1,9 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Request as Req } from 'express';
+import { Not } from 'typeorm';
 
+import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -9,7 +12,13 @@ export class UsersController {
 
   @Get()
   @UseGuards(AuthGuard())
-  users() {
-    return this.usersService.findAll();
+  users(@Request() req: Req) {
+    const currentUser = req.user as UserDto;
+
+    return this.usersService.findAll({
+      where: {
+        id: Not(currentUser.id),
+      },
+    });
   }
 }
