@@ -21,6 +21,8 @@ export default function Home(props: HomeProps) {
   };
   const accessToken = localStorage.getItem('accessToken');
   const [users, setUsers] = useState<UserDto[]>([]);
+  const [selectedUser, setSelectedUser] = useState('');
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     fetch(`${SERVER_URL}/users`, {
@@ -45,12 +47,47 @@ export default function Home(props: HomeProps) {
       });
   }, [accessToken]);
 
-  console.log(users);
+  useEffect(() => {
+    if (selectedUser) {
+      fetch(
+        `${SERVER_URL}/messages?selectedUser=${decodeURIComponent(
+          selectedUser
+        )}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+        .then(async (response) => {
+          const data = await response.json();
+
+          /* CONSOLE DEBUG TOREMOVE */ /* prettier-ignore */ console.log("==LOG==\n", "data:", typeof data, "↴\n", data, "\n==END==\n")
+
+          // check for error response
+          if (!response.ok) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          setMessages(data);
+        })
+        .catch((errors) => {
+          console.error(errors);
+        });
+    }
+  }, [selectedUser, accessToken]);
 
   let usersMarkup;
   if (users.length > 0) {
     usersMarkup = users.map((user) => (
-      <div className="d-flex p-3" key={user.username}>
+      <div
+        className="d-flex p-3"
+        key={user.username}
+        onClick={() => setSelectedUser(user.id)}
+      >
         <p>{user.username}</p>
       </div>
     ));
