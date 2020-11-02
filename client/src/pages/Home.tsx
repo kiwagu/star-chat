@@ -13,6 +13,15 @@ type UserDto = {
   readonly username: string;
   readonly email: string;
 };
+
+type MessageDTO = {
+  readonly id: string;
+  readonly user: UserDto;
+  readonly toUser: UserDto;
+  readonly body: string;
+  readonly createdAt: number;
+};
+
 export default function Home(props: HomeProps) {
   const authDispatch = useAuthDispatch();
   const logout = () => {
@@ -22,7 +31,7 @@ export default function Home(props: HomeProps) {
   const accessToken = localStorage.getItem('accessToken');
   const [users, setUsers] = useState<UserDto[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<MessageDTO[]>([]);
 
   useEffect(() => {
     fetch(`${SERVER_URL}/users`, {
@@ -63,8 +72,6 @@ export default function Home(props: HomeProps) {
       )
         .then(async (response) => {
           const data = await response.json();
-
-          /* CONSOLE DEBUG TOREMOVE */ /* prettier-ignore */ console.log("==LOG==\n", "data:", typeof data, "↴\n", data, "\n==END==\n")
 
           // check for error response
           if (!response.ok) {
@@ -112,7 +119,13 @@ export default function Home(props: HomeProps) {
         <Col xs={4} className="p-0 bg-secondary">
           {usersMarkup}
         </Col>
-        <Col xs={8}>messages</Col>
+        <Col xs={8}>
+          {messages && messages.length > 0 ? (
+            messages.map((message) => <p key={message.id}>{message.body}</p>)
+          ) : (
+            <p>Messages</p>
+          )}
+        </Col>
       </Row>
     </Fragment>
   );
