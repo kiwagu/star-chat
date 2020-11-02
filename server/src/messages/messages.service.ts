@@ -1,9 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserDto } from 'src/users/dto/user.dto';
-import { UsersService } from 'src/users/users.service';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 
+import { UsersService } from 'src/users/users.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageEntity } from './entity/message.entity';
 
@@ -15,12 +14,10 @@ export class MessagesService {
     private readonly usersService: UsersService,
   ) {}
 
-  findAll(userId?: string) {
+  findAll(options?: FindManyOptions<MessageEntity>) {
     return this.messageRepository.find({
-      where: {
-        user: userId,
-      },
       relations: ['user', 'toUser'],
+      ...options,
     });
   }
 
