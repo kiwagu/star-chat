@@ -1,3 +1,29 @@
 $gray-600: rgb(245, 245, 245);
 
+$border-radius: 0;
+$paragraph-margin-bottom: 0;
+
 @import '~bootstrap/scss/bootstrap';
+
+body {    
+    background-color: palegoldenrod;
+}
+
+.user-div:hover{
+    background-color: rgb(250, 250, 250);
+}
+
+.messages-box {
+    height: 500px;
+    overflow-y: scroll;
+
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.message-time-label {
+    font-size: smaller;
+}

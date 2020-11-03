@@ -1,26 +1,15 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
 
+import { MessageDto, UserDto } from '../types';
 import { SERVER_URL } from '../consts';
 import { useAuthDispatch } from '../context/auth';
+import Message from '../components/Message';
 
 /* eslint-disable-next-line */
 export interface HomeProps {}
-
-type UserDto = {
-  readonly id: string;
-  readonly username: string;
-  readonly email: string;
-};
-
-type MessageDTO = {
-  readonly id: string;
-  readonly user: UserDto;
-  readonly toUser: UserDto;
-  readonly body: string;
-  readonly createdAt: number;
-};
 
 export default function Home(props: HomeProps) {
   const authDispatch = useAuthDispatch();
@@ -31,7 +20,7 @@ export default function Home(props: HomeProps) {
   const accessToken = localStorage.getItem('accessToken');
   const [users, setUsers] = useState<UserDto[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
-  const [messages, setMessages] = useState<MessageDTO[]>([]);
+  const [messages, setMessages] = useState<MessageDto[]>([]);
 
   useEffect(() => {
     fetch(`${SERVER_URL}/users`, {
@@ -91,7 +80,10 @@ export default function Home(props: HomeProps) {
   if (users.length > 0) {
     usersMarkup = users.map((user) => (
       <div
-        className="d-flex p-3"
+        role="button"
+        className={classNames('user-div d-flex p-3', {
+          'bg-white': user.id === selectedUser,
+        })}
         key={user.username}
         onClick={() => setSelectedUser(user.id)}
       >
@@ -119,9 +111,11 @@ export default function Home(props: HomeProps) {
         <Col xs={4} className="p-0 bg-secondary">
           {usersMarkup}
         </Col>
-        <Col xs={8}>
+        <Col xs={8} className="messages-box d-flex flex-column bg-white">
           {messages && messages.length > 0 ? (
-            messages.map((message) => <p key={message.id}>{message.body}</p>)
+            messages.map((message) => (
+              <Message key={message.id} message={message} />
+            ))
           ) : (
             <p>Messages</p>
           )}
