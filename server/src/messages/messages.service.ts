@@ -5,6 +5,7 @@ import { FindManyOptions, Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageEntity } from './entity/message.entity';
+import { UserDto } from 'src/users/dto/user.dto';
 
 @Injectable()
 export class MessagesService {
@@ -22,7 +23,7 @@ export class MessagesService {
   }
 
   async create(
-    userId: string,
+    user: UserDto,
     createMessageDto: CreateMessageDto,
   ): Promise<MessageEntity> {
     const toUser = await this.usersService.findOne({
@@ -38,9 +39,7 @@ export class MessagesService {
 
     try {
       const message: MessageEntity = this.messageRepository.create({
-        user: {
-          id: userId,
-        },
+        user,
         toUser,
         body: createMessageDto.body,
       });
