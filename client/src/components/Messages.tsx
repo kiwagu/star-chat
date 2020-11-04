@@ -1,18 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import { Col } from 'react-bootstrap';
+import React, {
+  FormEvent,
+  Fragment,
+  MouseEvent,
+  useEffect,
+  useState,
+} from 'react';
+import { Col, Form } from 'react-bootstrap';
 
 import Message from './Message';
 import { SERVER_URL } from '../consts';
-import { MessageDto } from '../types';
+import { CreateMessageDto, MessageDto } from '../types';
 import { useAuthState } from '../context/auth';
 
 interface MessagesProps {
   selectedUser: string;
 }
 
+const sendMessage = async (
+  accessToken: string,
+  params: CreateMessageDto
+): Promise<MessageDto> => {
+  const response = await fetch(`${SERVER_URL}/messages`, {
+    method: 'POST',
+    body: JSON.stringify(params),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return await response.json();
+};
+
 export default function Messages({ selectedUser }: MessagesProps) {
   const authState = useAuthState();
   const [messages, setMessages] = useState<MessageDto[]>([]);
+  const [messageContent, setMessageContent] = useState('');
+  const submitMessage = (
+    e: FormEvent<HTMLFormElement> | MouseEvent<HTMLElement>
+  ) => {
+    e.preventDefault();
+
+    if (messageContent.trim() === '' || !selectedUser) return;
+
+    sendMessage(authState.credentials?.accessToken || '', {
+      body: messageContent,
+      toUserId: selectedUser,
+    }).then((message) => {
+      if (message?.id) {
+        setMessages([message, ...messages]);
+        setMessageContent('');
+      }
+    });
+  };
 
   useEffect(() => {
     if (selectedUser) {
@@ -46,14 +85,41 @@ export default function Messages({ selectedUser }: MessagesProps) {
   }, [selectedUser, authState]);
 
   return (
-    <Col xs={8} className="messages-box d-flex flex-column bg-white">
-      {messages && messages.length > 0 ? (
-        messages.map((message) => (
-          <Message key={message.id} message={message} />
-        ))
-      ) : (
-        <p>Messages</p>
-      )}
+    <Col xs={10} md={8} className="bg-white">
+      <div className="messages-box p-0 mt-3 d-flex flex-column-reverse">
+        {messages && messages.length > 0 ? (
+          messages.map((message, index) => (
+            <Fragment key={message.id}>
+              <Message message={message} />
+              {index === messages.length - 1 && (
+                <div className="invisible">
+                  <hr className="m-0" />
+                </div>
+              )}
+            </Fragment>
+          ))
+        ) : (
+          <p>Messages</p>
+        )}
+      </div>
+      <div>
+        <Form onSubmit={submitMessage}>
+          <Form.Group className="d-flex align-items-center">
+            <Form.Control
+              type="text"
+              className="message-input p-4 mt-3 rounded-pill bg-secondary border-0"
+              placeholder="Type a message..."
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+            />
+            <i
+              className="fas fa-paper-plane mt-3 fa-2x text-primary ml-2"
+              onClick={submitMessage}
+              role="button"
+            ></i>
+          </Form.Group>
+        </Form>
+      </div>
     </Col>
   );
 }

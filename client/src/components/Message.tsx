@@ -11,7 +11,7 @@ export interface MessageProps {
 }
 export default function Message({ message }: MessageProps) {
   const { credentials } = useAuthState();
-  const sent = message.user.username === credentials?.username;
+  const sent = message.user?.username === credentials?.username;
   const received = !sent;
   return (
     <div

@@ -11,3 +11,8 @@ export type MessageDto = {
   body: string;
   createdAt: number;
 };
+
+export type CreateMessageDto = {
+  toUserId: string;
+  body: string;
+};

@@ -27,3 +27,7 @@ body {
 .message-time-label {
     font-size: smaller;
 }
+
+.message-input::placeholder {
+    color: rgba($color: #000000, $alpha: .5);
+}
