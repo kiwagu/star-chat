@@ -37,6 +37,9 @@ export class MessagesController {
           toUser: user.id,
         },
       ],
+      order: {
+        createdAt: 'DESC',
+      },
     });
   }
 
@@ -46,8 +49,8 @@ export class MessagesController {
     @Req() req: any,
     @Body() createMessageDto: CreateMessageDto,
   ): Promise<MessageEntity> {
-    const user = req.user as UserDto;
+    const { user }: { user: UserDto } = req;
 
-    return await this.messagesService.create(user.id, createMessageDto);
+    return await this.messagesService.create(user, createMessageDto);
   }
 }
