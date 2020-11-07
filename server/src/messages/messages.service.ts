@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, Repository } from 'typeorm';
 
@@ -9,6 +9,8 @@ import { UserDto } from 'src/users/dto/user.dto';
 
 @Injectable()
 export class MessagesService {
+  public push: (message: MessageEntity) => void;
+
   constructor(
     @InjectRepository(MessageEntity)
     private readonly messageRepository: Repository<MessageEntity>,
@@ -52,5 +54,9 @@ export class MessagesService {
           throw new HttpException(error.message, HttpStatus.NOT_IMPLEMENTED);
       }
     }
+  }
+
+  public attachSender(push: (message: MessageEntity) => void) {
+    this.push = push;
   }
 }
