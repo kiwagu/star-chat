@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { UserDto } from '../types';
 import { SERVER_URL } from '../consts';
-import { useAuthDispatch } from '../context/auth';
+import { useAuthDispatch, useAuthState } from '../context/auth';
 import Messages from '../components/Messages';
 
 // TODO: move user to the component
@@ -15,11 +15,12 @@ export interface HomeProps {}
 
 export default function Home(props: HomeProps) {
   const authDispatch = useAuthDispatch();
+  const authState = useAuthState();
   const logout = () => {
     authDispatch({ type: 'LOGOUT' });
     window.location.href = '/login';
   };
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = authState.credentials?.accessToken;
   const [users, setUsers] = useState<UserDto[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
 

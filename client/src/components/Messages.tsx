@@ -6,9 +6,10 @@ import React, {
   useState,
 } from 'react';
 import { Col, Form } from 'react-bootstrap';
+import openSocket, { Socket } from 'socket.io-client';
 
 import Message from './Message';
-import { SERVER_URL } from '../consts';
+import { SERVER_URL, WEBSOCKET_SERVER_URL } from '../consts';
 import { CreateMessageDto, MessageDto } from '../types';
 import { useAuthState } from '../context/auth';
 
@@ -30,11 +31,12 @@ const sendMessage = async (
   });
   return await response.json();
 };
-
 export default function Messages({ selectedUser }: MessagesProps) {
   const authState = useAuthState();
+  const accessToken = authState.credentials?.accessToken;
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [messageContent, setMessageContent] = useState('');
+  const [isWsAuthenticated, setIsWsAuthenticated] = useState(false);
   const submitMessage = (
     e: FormEvent<HTMLFormElement> | MouseEvent<HTMLElement>
   ) => {
@@ -42,15 +44,11 @@ export default function Messages({ selectedUser }: MessagesProps) {
 
     if (messageContent.trim() === '' || !selectedUser) return;
 
-    sendMessage(authState.credentials?.accessToken || '', {
-      body: messageContent,
-      toUserId: selectedUser,
-    }).then((message) => {
-      if (message?.id) {
-        setMessages([message, ...messages]);
-        setMessageContent('');
-      }
-    });
+    isWsAuthenticated &&
+      sendMessage(accessToken || '', {
+        body: messageContent,
+        toUserId: selectedUser,
+      });
   };
 
   useEffect(() => {
@@ -82,7 +80,45 @@ export default function Messages({ selectedUser }: MessagesProps) {
           console.error(errors);
         });
     }
-  }, [selectedUser, authState]);
+  }, [selectedUser, authState, accessToken]);
+
+  useEffect(() => {
+    const socket = openSocket(WEBSOCKET_SERVER_URL);
+    socket.on('message', (message: MessageDto) => {
+      if (
+        message.user.id === selectedUser ||
+        message.toUser.id === selectedUser
+      ) {
+        setMessages([message, ...messages]);
+        setMessageContent('');
+      }
+    });
+
+    socket.on(
+      'authenticated',
+      (authStatusResponse: { success: boolean }) => {
+        setIsWsAuthenticated(authStatusResponse.success);
+        if (authStatusResponse.success) {
+          console.log('WS was authenticated');
+          return;
+        }
+        console.error('WS was not authenticated');
+      }
+    );
+    socket.emit('authenticate', {
+      accessToken,
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [
+    accessToken,
+    authState.credentials?.username,
+    isWsAuthenticated,
+    messages,
+    selectedUser,
+  ]);
 
   return (
     <Col xs={10} md={8} className="bg-white">

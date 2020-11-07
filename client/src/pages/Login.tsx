@@ -36,7 +36,7 @@ export default function Login(props: RouteComponentProps<any>) {
         dispatch({ type: 'LOGIN', payload: data });
         setFormVariables(initialsFormsVariables);
         setIsShowError(false);
-        props.history.push('/');
+        window.location.href = '/';
       })
       .catch((errors) => {
         setError(typeof errors === 'string' ? [errors] : errors);
