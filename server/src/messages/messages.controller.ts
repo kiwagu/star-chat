@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserDto } from 'src/users/dto/user.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -11,10 +19,27 @@ export class MessagesController {
 
   @Get()
   @UseGuards(AuthGuard())
-  public async messages(@Req() req: any) {
+  public async messages(
+    @Req() req: any,
+    @Query('selectedUser') selectedUser: string,
+  ) {
     const user = req.user as UserDto;
 
-    return this.messagesService.findAll(user.id);
+    return this.messagesService.findAll({
+      where: [
+        {
+          user: user.id,
+          toUser: selectedUser,
+        },
+        {
+          user: selectedUser,
+          toUser: user.id,
+        },
+      ],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 
   @Post()

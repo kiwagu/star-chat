@@ -5,6 +5,7 @@ import classNames from 'classnames';
 
 import { SERVER_URL } from '../consts';
 import { useAuthDispatch } from '../context/auth';
+import Messages from '../components/Messages';
 
 /* eslint-disable-next-line */
 export interface HomeProps {}
@@ -47,8 +48,6 @@ export default function Home(props: HomeProps) {
       });
   }, [accessToken]);
 
-  console.log(users);
-
   let usersMarkup;
   if (users.length > 0) {
     usersMarkup = users.map((user) => (
@@ -83,7 +82,7 @@ export default function Home(props: HomeProps) {
         <Col xs={4} className="p-0 bg-secondary">
           {usersMarkup}
         </Col>
-        <Col xs={8}>{selectedUser}</Col>
+        <Messages selectedUser={selectedUser} />
       </Row>
     </Fragment>
   );
