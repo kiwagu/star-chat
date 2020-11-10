@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { FindManyOptions, Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -21,7 +22,7 @@ export class MessagesService {
   }
 
   async create(
-    userId: string,
+    user: UserDto,
     createMessageDto: CreateMessageDto,
   ): Promise<MessageEntity> {
     const toUser = await this.usersService.findOne({
@@ -37,9 +38,7 @@ export class MessagesService {
 
     try {
       const message: MessageEntity = this.messageRepository.create({
-        user: {
-          id: userId,
-        },
+        user,
         toUser,
         body: createMessageDto.body,
       });

@@ -1,18 +1,56 @@
-import React, { useEffect, useState, Fragment } from 'react';
-import { Col } from 'react-bootstrap';
+import React, {
+  useEffect,
+  useState,
+  Fragment,
+  FormEvent,
+  MouseEvent,
+} from 'react';
+import { Col, Form } from 'react-bootstrap';
 import { SERVER_URL } from '../consts';
 import { useAuthState } from '../context/auth';
-import { MessageDto } from '../types';
+import { MessageDto, CreateMessageDto } from '../types';
 import Message from './Message';
 
 interface MessagesProps {
   selectedUser: string;
 }
 
+const sendMessage = async (
+  accessToken: string,
+  params: CreateMessageDto
+): Promise<MessageDto> => {
+  const response = await fetch(`${SERVER_URL}/messages`, {
+    method: 'POST',
+    body: JSON.stringify(params),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return await response.json();
+};
+
 export default function Messages({ selectedUser }: MessagesProps) {
   const authState = useAuthState();
   const [messages, setMessages] = useState<MessageDto[]>([]);
+  const [messageContent, setMessageContent] = useState<string>('');
+  const submitMessage = (
+    e: FormEvent<HTMLFormElement> | MouseEvent<HTMLElement>
+  ) => {
+    e.preventDefault();
 
+    if (messageContent.trim() === '' || !selectedUser) return;
+
+    sendMessage(authState.credentials?.accessToken || '', {
+      body: messageContent,
+      toUserId: selectedUser,
+    }).then((message) => {
+      if (message?.id) {
+        setMessages([message, ...messages]);
+        setMessageContent('');
+      }
+    });
+  };
   useEffect(() => {
     if (selectedUser) {
       fetch(
@@ -56,6 +94,24 @@ export default function Messages({ selectedUser }: MessagesProps) {
         ) : (
           <p>Messages</p>
         )}
+      </div>
+      <div>
+        <Form onSubmit={submitMessage}>
+          <Form.Group className="d-flex align-items-center">
+            <Form.Control
+              type="text"
+              className="message-input p-4 mt-3 rounded-pill bg-secondary border-0"
+              placeholder="Type a message..."
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+            />
+            <i
+              className="fas fa-paper-plane mt-3 fa-2x text-primary ml-2"
+              onClick={submitMessage}
+              role="button"
+            ></i>
+          </Form.Group>
+        </Form>
       </div>
     </Col>
   );

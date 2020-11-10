@@ -50,6 +50,6 @@ export class MessagesController {
   ): Promise<MessageEntity> {
     const user = req.user as UserDto;
 
-    return await this.messagesService.create(user.id, createMessageDto);
+    return await this.messagesService.create(user, createMessageDto);
   }
 }
