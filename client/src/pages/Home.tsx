@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
 
 import { SERVER_URL } from '../consts';
 import { useAuthDispatch } from '../context/auth';
@@ -21,6 +22,7 @@ export default function Home(props: HomeProps) {
   };
   const accessToken = localStorage.getItem('accessToken');
   const [users, setUsers] = useState<UserDto[]>([]);
+  const [selectedUser, setSelectedUser] = useState('');
 
   useEffect(() => {
     fetch(`${SERVER_URL}/users`, {
@@ -50,7 +52,13 @@ export default function Home(props: HomeProps) {
   let usersMarkup;
   if (users.length > 0) {
     usersMarkup = users.map((user) => (
-      <div className="d-flex p-3" key={user.username}>
+      <div
+        className={classNames('user-div d-flex p-3', {
+          'bg-white': user.id === selectedUser,
+        })}
+        key={user.username}
+        onClick={() => setSelectedUser(user.id)}
+      >
         <p>{user.username}</p>
       </div>
     ));
@@ -75,7 +83,7 @@ export default function Home(props: HomeProps) {
         <Col xs={4} className="p-0 bg-secondary">
           {usersMarkup}
         </Col>
-        <Col xs={8}>messages</Col>
+        <Col xs={8}>{selectedUser}</Col>
       </Row>
     </Fragment>
   );
