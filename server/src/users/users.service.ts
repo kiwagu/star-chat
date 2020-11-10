@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/user-login.dto';
@@ -25,9 +25,10 @@ export class UsersService {
     return userDTO;
   }
 
-  async findAll(): Promise<UserDto[]> {
+  async findAll(options?: FindManyOptions<UserEntity>): Promise<UserDto[]> {
     return await this.userRepository.find({
       select: ['id', 'username', 'email'],
+      ...options,
     });
   }
   async findByLogin({ username, password }: LoginUserDto): Promise<UserDto> {
