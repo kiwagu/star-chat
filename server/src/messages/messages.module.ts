@@ -7,6 +7,7 @@ import { UsersModule } from 'src/users/users.module';
 import { MessageEntity } from './entity/message.entity';
 import { MessagesController } from './messages.controller';
 import { MessagesService } from './messages.service';
+import { MessagesGateway } from './messages.gateway';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { MessagesService } from './messages.service';
     UsersModule,
   ],
   controllers: [MessagesController],
-  providers: [MessagesService],
+  providers: [MessagesService, MessagesGateway],
 })
 export class MessagesModule {}

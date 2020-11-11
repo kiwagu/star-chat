@@ -8,11 +8,17 @@ import { MessageEntity } from './entity/message.entity';
 
 @Injectable()
 export class MessagesService {
+  public push: (message: MessageEntity) => void;
+
   constructor(
     @InjectRepository(MessageEntity)
     private readonly messageRepository: Repository<MessageEntity>,
     private readonly usersService: UsersService,
   ) {}
+
+  public attachSender(sender: (message: MessageEntity) => void) {
+    this.push = sender;
+  }
 
   findAll(options?: FindManyOptions<MessageEntity>) {
     return this.messageRepository.find({

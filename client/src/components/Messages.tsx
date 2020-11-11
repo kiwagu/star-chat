@@ -6,7 +6,9 @@ import React, {
   MouseEvent,
 } from 'react';
 import { Col, Form } from 'react-bootstrap';
-import { SERVER_URL } from '../consts';
+import openSocket from 'socket.io-client';
+
+import { SERVER_URL, WEBSOCKET_SERVER_URL } from '../consts';
 import { useAuthState } from '../context/auth';
 import { MessageDto, CreateMessageDto } from '../types';
 import Message from './Message';
@@ -32,6 +34,7 @@ const sendMessage = async (
 
 export default function Messages({ selectedUser }: MessagesProps) {
   const authState = useAuthState();
+  const accessToken = authState.credentials?.accessToken || '';
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [messageContent, setMessageContent] = useState<string>('');
   const submitMessage = (
@@ -41,14 +44,9 @@ export default function Messages({ selectedUser }: MessagesProps) {
 
     if (messageContent.trim() === '' || !selectedUser) return;
 
-    sendMessage(authState.credentials?.accessToken || '', {
+    sendMessage(accessToken, {
       body: messageContent,
       toUserId: selectedUser,
-    }).then((message) => {
-      if (message?.id) {
-        setMessages([message, ...messages]);
-        setMessageContent('');
-      }
     });
   };
   useEffect(() => {
@@ -81,6 +79,36 @@ export default function Messages({ selectedUser }: MessagesProps) {
         });
     }
   }, [selectedUser, authState]);
+
+  useEffect(() => {
+    const socket = openSocket(WEBSOCKET_SERVER_URL);
+
+    socket.on('message', (message: MessageDto) => {
+      if (
+        message.user.id === selectedUser ||
+        message.toUser.id === selectedUser
+      ) {
+        setMessages([message, ...messages]);
+        setMessageContent('');
+      }
+    });
+
+    socket.on('authenticated', (authStatusResponse: { success: boolean }) => {
+      if (authStatusResponse.success) {
+        console.log('WS was authenticated');
+        return;
+      }
+      console.error('WS was not authenticated');
+    });
+
+    socket.emit('authenticate', {
+      accessToken,
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [accessToken, messages, selectedUser]);
 
   return (
     <Col xs={10} md={8} className="bg-white">
