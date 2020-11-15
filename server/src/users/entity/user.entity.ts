@@ -13,6 +13,24 @@ export class UserEntity {
   username: string;
 
   @Column({
+    type: 'integer',
+    nullable: true,
+  })
+  uid: number;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  firstName: string;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  lastName: string;
+
+  @Column({
     type: 'varchar',
     nullable: false,
     select: false,
@@ -21,7 +39,7 @@ export class UserEntity {
 
   @Column({
     type: 'varchar',
-    nullable: false,
+    nullable: true,
   })
   email: string;
 

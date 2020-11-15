@@ -8,11 +8,19 @@ export class UserDto {
   @IsString()
   readonly id: string;
 
+  @IsString()
+  readonly uid?: number;
+
   @IsNotEmpty()
   @IsString()
   readonly username: string;
 
-  @IsNotEmpty()
   @IsEmail()
   readonly email: string;
+
+  @IsString()
+  readonly firstName?: string;
+
+  @IsString()
+  readonly lastName?: string;
 }

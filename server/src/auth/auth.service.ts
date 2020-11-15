@@ -8,6 +8,7 @@ import { JwtPayload } from './interfaces/payload.interface';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UserDto } from '../users/dto/user.dto';
+import { VkLoginUserDto } from '../users/dto/user-vk-login.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +38,18 @@ export class AuthService {
   async login(loginUserDto: LoginUserDto): Promise<LoginStatus> {
     // find user in db
     const user = await this.usersService.findByLogin(loginUserDto);
+    // generate and sign token
+    const token = this._createToken(user);
+
+    return {
+      username: user.username,
+      ...token,
+    };
+  }
+
+  async vklogin(vkLoginUserDto: VkLoginUserDto): Promise<LoginStatus> {
+    // find user in db
+    const user = await this.usersService.findOrCreateLoginByVk(vkLoginUserDto);
     // generate and sign token
     const token = this._createToken(user);
 

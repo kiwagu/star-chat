@@ -19,8 +19,6 @@ export class MessagesGateway implements OnGatewayDisconnect {
 
   constructor(private readonly messagesService: MessagesService) {
     this.messagesService.attachSender(message => {
-      console.log(message);
-
       this.clientSocketsMap.forEach(({ username, socket }) => {
         if (
           username === message.user.username ||
@@ -47,8 +45,6 @@ export class MessagesGateway implements OnGatewayDisconnect {
     socket: Socket,
     payloud: { accessToken: string },
   ): Promise<WsResponse<{ success: boolean; message?: string }>> {
-    console.log('payloud:', payloud);
-
     try {
       const { username, exp } = jwt.verify(
         payloud?.accessToken,

@@ -2,9 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import * as crypto from 'crypto';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/user-login.dto';
+import { VkLoginUserDto } from './dto/user-vk-login.dto';
 import { UserDto } from './dto/user.dto';
 import { UserEntity } from './entity/user.entity';
 
@@ -27,7 +29,7 @@ export class UsersService {
 
   async findAll(options?: FindManyOptions<UserEntity>): Promise<UserDto[]> {
     return await this.userRepository.find({
-      select: ['id', 'username', 'email'],
+      select: ['id', 'username', 'firstName', 'lastName', 'email'],
       ...options,
     });
   }
@@ -44,6 +46,49 @@ export class UsersService {
 
     if (!areEqual) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
+    const { password: pass, ...userDto } = user;
+
+    return userDto;
+  }
+
+  async findOrCreateLoginByVk({
+    firstName,
+    lastName,
+    uid,
+    hash,
+  }: VkLoginUserDto): Promise<UserDto> {
+    const isVkPayloadValid =
+      hash ===
+      crypto
+        .createHash('md5')
+        .update(`${process.env.VK_APP_ID}${uid}${process.env.VK_SECRET_KEY}`)
+        .digest('hex');
+
+    if (!isVkPayloadValid) {
+      throw new HttpException(
+        'Invalid VK credentials',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    let user = await this.userRepository.findOne({
+      select: ['id', 'uid', 'email', 'username', 'firstName', 'lastName'],
+      where: { uid },
+    });
+
+    if (!user) {
+      user = this.userRepository.create({
+        uid,
+        username: `${uid}`,
+        firstName,
+        lastName,
+        password: Math.random()
+          .toString(36)
+          .substring(7),
+      });
+      await this.userRepository.save(user);
     }
 
     const { password: pass, ...userDto } = user;
