@@ -2,13 +2,13 @@ import React from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { MessageDto } from '../types';
 import { useAuthState } from '../context/auth';
+import { MessageDto } from '../types';
 
-/* eslint-disable-next-line */
 export interface MessageProps {
   message: MessageDto;
 }
+
 export default function Message({ message }: MessageProps) {
   const { credentials } = useAuthState();
   const sent = message.user?.username === credentials?.username;

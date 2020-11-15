@@ -8,8 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-
-import { UserDto } from '../users/dto/user.dto';
+import { UserDto } from 'src/users/dto/user.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageEntity } from './entity/message.entity';
 import { MessagesService } from './messages.service';
@@ -49,7 +48,8 @@ export class MessagesController {
     @Req() req: any,
     @Body() createMessageDto: CreateMessageDto,
   ): Promise<MessageEntity> {
-    const { user }: { user: UserDto } = req;
+    const user = req.user as UserDto;
+
     const message = await this.messagesService.create(user, createMessageDto);
 
     this.messagesService.push(message);

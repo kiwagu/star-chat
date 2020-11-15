@@ -1,17 +1,17 @@
 import React, {
-  FormEvent,
-  Fragment,
-  MouseEvent,
   useEffect,
   useState,
+  Fragment,
+  FormEvent,
+  MouseEvent,
 } from 'react';
 import { Col, Form } from 'react-bootstrap';
-import openSocket, { Socket } from 'socket.io-client';
+import openSocket from 'socket.io-client';
 
-import Message from './Message';
 import { SERVER_URL, WEBSOCKET_SERVER_URL } from '../consts';
-import { CreateMessageDto, MessageDto } from '../types';
 import { useAuthState } from '../context/auth';
+import { MessageDto, CreateMessageDto } from '../types';
+import Message from './Message';
 
 interface MessagesProps {
   selectedUser: string;
@@ -31,12 +31,12 @@ const sendMessage = async (
   });
   return await response.json();
 };
+
 export default function Messages({ selectedUser }: MessagesProps) {
   const authState = useAuthState();
-  const accessToken = authState.credentials?.accessToken;
+  const accessToken = authState.credentials?.accessToken || '';
   const [messages, setMessages] = useState<MessageDto[]>([]);
-  const [messageContent, setMessageContent] = useState('');
-  const [isWsAuthenticated, setIsWsAuthenticated] = useState(false);
+  const [messageContent, setMessageContent] = useState<string>('');
   const submitMessage = (
     e: FormEvent<HTMLFormElement> | MouseEvent<HTMLElement>
   ) => {
@@ -44,13 +44,11 @@ export default function Messages({ selectedUser }: MessagesProps) {
 
     if (messageContent.trim() === '' || !selectedUser) return;
 
-    isWsAuthenticated &&
-      sendMessage(accessToken || '', {
-        body: messageContent,
-        toUserId: selectedUser,
-      });
+    sendMessage(accessToken, {
+      body: messageContent,
+      toUserId: selectedUser,
+    });
   };
-
   useEffect(() => {
     if (selectedUser) {
       fetch(
@@ -80,10 +78,11 @@ export default function Messages({ selectedUser }: MessagesProps) {
           console.error(errors);
         });
     }
-  }, [selectedUser, authState, accessToken]);
+  }, [selectedUser, authState]);
 
   useEffect(() => {
     const socket = openSocket(WEBSOCKET_SERVER_URL);
+
     socket.on('message', (message: MessageDto) => {
       if (
         message.user.id === selectedUser ||
@@ -94,17 +93,14 @@ export default function Messages({ selectedUser }: MessagesProps) {
       }
     });
 
-    socket.on(
-      'authenticated',
-      (authStatusResponse: { success: boolean }) => {
-        setIsWsAuthenticated(authStatusResponse.success);
-        if (authStatusResponse.success) {
-          console.log('WS was authenticated');
-          return;
-        }
-        console.error('WS was not authenticated');
+    socket.on('authenticated', (authStatusResponse: { success: boolean }) => {
+      if (authStatusResponse.success) {
+        console.log('WS was authenticated');
+        return;
       }
-    );
+      console.error('WS was not authenticated');
+    });
+
     socket.emit('authenticate', {
       accessToken,
     });
@@ -112,13 +108,7 @@ export default function Messages({ selectedUser }: MessagesProps) {
     return () => {
       socket.disconnect();
     };
-  }, [
-    accessToken,
-    authState.credentials?.username,
-    isWsAuthenticated,
-    messages,
-    selectedUser,
-  ]);
+  }, [accessToken, messages, selectedUser]);
 
   return (
     <Col xs={10} md={8} className="bg-white">
@@ -127,11 +117,6 @@ export default function Messages({ selectedUser }: MessagesProps) {
           messages.map((message, index) => (
             <Fragment key={message.id}>
               <Message message={message} />
-              {index === messages.length - 1 && (
-                <div className="invisible">
-                  <hr className="m-0" />
-                </div>
-              )}
             </Fragment>
           ))
         ) : (

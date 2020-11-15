@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useCallback, useEffect, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { RouteComponentProps, Link } from 'react-router-dom';
 
@@ -7,10 +7,13 @@ import { SERVER_URL } from '../consts';
 import { Payloud, useAuthDispatch } from '../context/auth';
 
 export default function Login(props: RouteComponentProps<any>) {
-  const initialsFormsVariables = {
-    username: '',
-    password: '',
-  };
+  const initialsFormsVariables = useCallback(
+    () => ({
+      username: '',
+      password: '',
+    }),
+    []
+  );
   const [formsVariables, setFormVariables] = useState(initialsFormsVariables);
   const [errors, setError] = useState([]);
   const [isShowError, setIsShowError] = useState(false);
@@ -36,7 +39,7 @@ export default function Login(props: RouteComponentProps<any>) {
         dispatch({ type: 'LOGIN', payload: data });
         setFormVariables(initialsFormsVariables);
         setIsShowError(false);
-        window.location.href = '/';
+        props.history.push('/');
       })
       .catch((errors) => {
         setError(typeof errors === 'string' ? [errors] : errors);
@@ -49,6 +52,51 @@ export default function Login(props: RouteComponentProps<any>) {
       [e.target.name]: e.target.value,
     });
   };
+  const [isVkAuthorisedOnce, setIsVkAuthorisedOnce] = useState(false);
+  const onAuth = useCallback(
+    ({ uid, hash, first_name, last_name }: any) => {
+      fetch(`${SERVER_URL}/auth/vklogin`, {
+        method: 'POST',
+        body: JSON.stringify({
+          uid,
+          hash,
+          firstName: first_name,
+          lastName: last_name,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then(async (response) => {
+          const data: Payloud = await response.json();
+
+          // check for error response
+          if (!response.ok) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+
+          dispatch({ type: 'LOGIN', payload: data });
+          setFormVariables(initialsFormsVariables);
+          setIsShowError(false);
+          props.history.push('/');
+        })
+        .catch((errors) => {
+          setError(typeof errors === 'string' ? [errors] : errors);
+          setIsShowError(true);
+        });
+    },
+    [dispatch, initialsFormsVariables, props.history]
+  );
+
+  useEffect(() => {
+    if (!isVkAuthorisedOnce) {
+      // @ts-ignore
+      window.VK.Widgets.Auth('vk-auth-widget', {
+        onAuth,
+      });
+      setIsVkAuthorisedOnce(true);
+    }
+  }, [isVkAuthorisedOnce, onAuth]);
 
   return (
     <Row className="bg-white py-5 justify-content-center">
@@ -80,6 +128,12 @@ export default function Login(props: RouteComponentProps<any>) {
             <Button variant="success" type="submit">
               Login
             </Button>
+          </div>
+          <br />
+          <div className="text-center">-- OR --</div>
+          <br />
+          <div className="text-center vk-center">
+            <div id="vk-auth-widget" />
           </div>
           <br />
           <small>

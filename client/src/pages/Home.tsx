@@ -3,24 +3,27 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 
-import { UserDto } from '../types';
 import { SERVER_URL } from '../consts';
-import { useAuthDispatch, useAuthState } from '../context/auth';
+import { useAuthDispatch } from '../context/auth';
 import Messages from '../components/Messages';
-
-// TODO: move user to the component
 
 /* eslint-disable-next-line */
 export interface HomeProps {}
 
+type UserDto = {
+  id: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+};
 export default function Home(props: HomeProps) {
   const authDispatch = useAuthDispatch();
-  const authState = useAuthState();
   const logout = () => {
     authDispatch({ type: 'LOGOUT' });
     window.location.href = '/login';
   };
-  const accessToken = authState.credentials?.accessToken;
+  const accessToken = localStorage.getItem('accessToken');
   const [users, setUsers] = useState<UserDto[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
 
@@ -51,14 +54,17 @@ export default function Home(props: HomeProps) {
   if (users.length > 0) {
     usersMarkup = users.map((user) => (
       <div
-        role="button"
         className={classNames('user-div d-flex p-3', {
           'bg-white': user.id === selectedUser,
         })}
         key={user.username}
         onClick={() => setSelectedUser(user.id)}
       >
-        <p>{user.username}</p>
+        <p>
+          {user.firstName && user.lastName
+            ? `${user.firstName} ${user.lastName}`
+            : user.username}
+        </p>
       </div>
     ));
   } else {

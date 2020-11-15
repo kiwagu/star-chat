@@ -1,11 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Repository } from 'typeorm';
-
+import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageEntity } from './entity/message.entity';
-import { UserDto } from 'src/users/dto/user.dto';
 
 @Injectable()
 export class MessagesService {
@@ -16,6 +15,10 @@ export class MessagesService {
     private readonly messageRepository: Repository<MessageEntity>,
     private readonly usersService: UsersService,
   ) {}
+
+  public attachSender(sender: (message: MessageEntity) => void) {
+    this.push = sender;
+  }
 
   findAll(options?: FindManyOptions<MessageEntity>) {
     return this.messageRepository.find({
@@ -54,9 +57,5 @@ export class MessagesService {
           throw new HttpException(error.message, HttpStatus.NOT_IMPLEMENTED);
       }
     }
-  }
-
-  public attachSender(push: (message: MessageEntity) => void) {
-    this.push = push;
   }
 }

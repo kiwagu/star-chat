@@ -1,10 +1,10 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request as Req } from 'express';
 import { Not } from 'typeorm';
+import { Request as Req } from 'express';
 
-import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
+import { UserDto } from './dto/user.dto';
 
 @Controller('users')
 export class UsersController {

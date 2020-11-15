@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from 'src/users/users.module';
 
-import { MessagesService } from './messages.service';
-import { MessagesController } from './messages.controller';
 import { MessageEntity } from './entity/message.entity';
-import { UsersModule } from '../users/users.module';
+import { MessagesController } from './messages.controller';
+import { MessagesService } from './messages.service';
 import { MessagesGateway } from './messages.gateway';
 
 @Module({
@@ -25,7 +25,7 @@ import { MessagesGateway } from './messages.gateway';
     }),
     UsersModule,
   ],
-  providers: [MessagesService, MessagesGateway],
   controllers: [MessagesController],
+  providers: [MessagesService, MessagesGateway],
 })
 export class MessagesModule {}
