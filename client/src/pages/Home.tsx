@@ -12,6 +12,7 @@ export interface HomeProps {}
 
 type UserDto = {
   id: string;
+  uid?: number;
   username: string;
   firstName?: string;
   lastName?: string;

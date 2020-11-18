@@ -46,9 +46,7 @@ export class AuthController {
   public async vklogin(
     @Body() vkLoginUserDto: VkLoginUserDto,
   ): Promise<LoginStatus> {
-    const userDto = await this.authService.vklogin(vkLoginUserDto);
-
-    return userDto;
+    return await this.authService.vklogin(vkLoginUserDto);
   }
 
   @Get('whoami')

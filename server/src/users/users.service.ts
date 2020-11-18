@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import * as crypto from 'crypto';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/user-login.dto';
@@ -29,7 +29,7 @@ export class UsersService {
 
   async findAll(options?: FindManyOptions<UserEntity>): Promise<UserDto[]> {
     return await this.userRepository.find({
-      select: ['id', 'username', 'firstName', 'lastName', 'email'],
+      select: ['id', 'uid', 'username', 'firstName', 'lastName', 'email'],
       ...options,
     });
   }
@@ -54,16 +54,17 @@ export class UsersService {
     return userDto;
   }
 
-  async findOrCreateLoginByVk({
-    firstName,
-    lastName,
+  async findByVkLoginOrCreateUser({
     uid,
     hash,
+    firstName,
+    lastName,
   }: VkLoginUserDto): Promise<UserDto> {
     const isVkPayloadValid =
       hash ===
       crypto
         .createHash('md5')
+        // app_id+user_id+secret_key - https://vk.com/dev/Login
         .update(`${process.env.VK_APP_ID}${uid}${process.env.VK_SECRET_KEY}`)
         .digest('hex');
 

@@ -1,12 +1,16 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 /**
- * the LoginUserDto class that the application uses to verify the user’s credentials when they are trying to login
+ * the VkLoginUserDto class that the application uses to verify the user’s credentials when they are trying to login by BK
  */
 export class VkLoginUserDto {
   @IsNotEmpty()
   @IsNumber()
-  readonly uid: number; // VK user id
+  readonly uid: number;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly hash: string;
 
   @IsNotEmpty()
   @IsString()
@@ -15,8 +19,4 @@ export class VkLoginUserDto {
   @IsNotEmpty()
   @IsString()
   readonly lastName: string;
-
-  @IsNotEmpty()
-  @IsString()
-  readonly hash: string;
 }

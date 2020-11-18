@@ -49,7 +49,9 @@ export class AuthService {
 
   async vklogin(vkLoginUserDto: VkLoginUserDto): Promise<LoginStatus> {
     // find user in db
-    const user = await this.usersService.findOrCreateLoginByVk(vkLoginUserDto);
+    const user = await this.usersService.findByVkLoginOrCreateUser(
+      vkLoginUserDto,
+    );
     // generate and sign token
     const token = this._createToken(user);
 

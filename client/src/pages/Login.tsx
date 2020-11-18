@@ -52,7 +52,6 @@ export default function Login(props: RouteComponentProps<any>) {
       [e.target.name]: e.target.value,
     });
   };
-  const [isVkAuthorisedOnce, setIsVkAuthorisedOnce] = useState(false);
   const onAuth = useCallback(
     ({ uid, hash, first_name, last_name }: any) => {
       fetch(`${SERVER_URL}/auth/vklogin`, {
@@ -76,7 +75,6 @@ export default function Login(props: RouteComponentProps<any>) {
           }
 
           dispatch({ type: 'LOGIN', payload: data });
-          setFormVariables(initialsFormsVariables);
           setIsShowError(false);
           props.history.push('/');
         })
@@ -85,9 +83,9 @@ export default function Login(props: RouteComponentProps<any>) {
           setIsShowError(true);
         });
     },
-    [dispatch, initialsFormsVariables, props.history]
+    [dispatch, props.history]
   );
-
+  const [isVkAuthorisedOnce, setIsVkAuthorisedOnce] = useState(false);
   useEffect(() => {
     if (!isVkAuthorisedOnce) {
       // @ts-ignore

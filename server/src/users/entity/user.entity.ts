@@ -6,6 +6,12 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid') id: string;
 
   @Column({
+    type: 'integer',
+    nullable: true,
+  })
+  uid?: number;
+
+  @Column({
     type: 'varchar',
     nullable: false,
     unique: true,
@@ -13,22 +19,16 @@ export class UserEntity {
   username: string;
 
   @Column({
-    type: 'integer',
+    type: 'varchar',
     nullable: true,
   })
-  uid: number;
+  firstName?: string;
 
   @Column({
     type: 'varchar',
     nullable: true,
   })
-  firstName: string;
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-  })
-  lastName: string;
+  lastName?: string;
 
   @Column({
     type: 'varchar',
@@ -41,7 +41,7 @@ export class UserEntity {
     type: 'varchar',
     nullable: true,
   })
-  email: string;
+  email?: string;
 
   @BeforeInsert() async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
