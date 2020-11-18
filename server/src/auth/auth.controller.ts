@@ -16,6 +16,7 @@ import { LoginStatus } from './interfaces/login-status.interface';
 import { LoginUserDto } from '../users/dto/user-login.dto';
 import { JwtPayload } from './interfaces/payload.interface';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { VkLoginUserDto } from '../users/dto/user-vk-login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -39,6 +40,13 @@ export class AuthController {
   @Post('login')
   public async login(@Body() loginUserDto: LoginUserDto): Promise<LoginStatus> {
     return await this.authService.login(loginUserDto);
+  }
+
+  @Post('vklogin')
+  public async vklogin(
+    @Body() vkLoginUserDto: VkLoginUserDto,
+  ): Promise<LoginStatus> {
+    return await this.authService.vklogin(vkLoginUserDto);
   }
 
   @Get('whoami')

@@ -11,9 +11,12 @@ import Messages from '../components/Messages';
 export interface HomeProps {}
 
 type UserDto = {
-  readonly id: string;
-  readonly username: string;
-  readonly email: string;
+  id: string;
+  uid?: number;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
 };
 export default function Home(props: HomeProps) {
   const authDispatch = useAuthDispatch();
@@ -58,7 +61,11 @@ export default function Home(props: HomeProps) {
         key={user.username}
         onClick={() => setSelectedUser(user.id)}
       >
-        <p>{user.username}</p>
+        <p>
+          {user.firstName && user.lastName
+            ? `${user.firstName} ${user.lastName}`
+            : user.username}
+        </p>
       </div>
     ));
   } else {

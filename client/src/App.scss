@@ -31,3 +31,8 @@ body {
 .message-input::placeholder {
     color: rgba($color: #000000, $alpha: .5);
 }
+
+.vk-center > div{
+    margin-left: auto;
+    margin-right: auto;
+}
