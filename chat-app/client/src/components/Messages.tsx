@@ -10,6 +10,7 @@ import openSocket from 'socket.io-client';
 
 import { SERVER_URL, WEBSOCKET_SERVER_URL } from '../consts';
 import { useAuthState } from '../context/auth';
+import Payment from './Payment';
 import { MessageDto, CreateMessageDto } from '../types';
 import Message from './Message';
 
@@ -140,6 +141,7 @@ export default function Messages({ selectedUser }: MessagesProps) {
             ></i>
           </Form.Group>
         </Form>
+        <Payment selectedUser={selectedUser} />
       </div>
     </Col>
   );

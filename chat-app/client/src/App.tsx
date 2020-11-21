@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import { AuthProvider } from './context/auth';
 import DynamicRoute from './utils/DynamicRoutes';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -21,6 +22,12 @@ function App() {
               exact
               path="/"
               component={Home}
+              authenticated={true} // authenticated user
+            />
+            <DynamicRoute
+              exact
+              path="/profile"
+              component={Profile}
               authenticated={true} // authenticated user
             />
             <DynamicRoute

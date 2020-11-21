@@ -1,0 +1,11 @@
+<h1>Welcome to LocalBank!</h1>
+<h6>{{ message }}</h6>
+<form action="/transfers/pin" method="POST">
+  <div class="form-group">
+    <label for="pinInput">Please, provide PIN</label>
+    <input type="number" name="pinInput" class="form-control" id="pinInput" placeholder="PIN" maxlength="4"
+      value="1234">
+    <input type="hidden" name="secretKey" value="someSecretValue">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>

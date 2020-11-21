@@ -75,11 +75,11 @@ export default function Home(props: HomeProps) {
   return (
     <Fragment>
       <Row className="bg-white justify-content-around mb-1">
-        <Link to="/login">
-          <Button variant="link">Login</Button>
+        <Link to="/">
+          <Button variant="link">Home</Button>
         </Link>
-        <Link to="/register">
-          <Button variant="link">Register</Button>
+        <Link to="/profile">
+          <Button variant="link">Profile</Button>
         </Link>
         <Button variant="link" onClick={logout}>
           Logout

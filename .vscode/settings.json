@@ -3,7 +3,7 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "database": "./server/tmp/db",
+            "database": "${workspaceFolder:star-chat}/chat-app/server/tmp/db",
             "name": "SQLite"
         }
     ]

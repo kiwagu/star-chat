@@ -7,6 +7,7 @@ import { UserEntity } from './users/entity/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { MessagesModule } from './messages/messages.module';
 import { MessageEntity } from './messages/entity/message.entity';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MessageEntity } from './messages/entity/message.entity';
     }),
     AuthModule,
     MessagesModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
