@@ -1,5 +1,5 @@
 import React, { FormEvent, MouseEvent, useState } from 'react';
-import { Col, Form } from 'react-bootstrap';
+import { Col, Form, Spinner, Badge } from 'react-bootstrap';
 
 import { SERVER_URL } from '../consts';
 import { useAuthState } from '../context/auth';
@@ -7,14 +7,20 @@ import { useAuthState } from '../context/auth';
 interface PaymentProps {
   selectedUser: string;
 }
+type PaymentStatus = 'pending' | 'success' | 'failed';
 
 export default function Payment({ selectedUser }: PaymentProps) {
   const authState = useAuthState();
   const [amount, setAmount] = useState<string>('10');
+  const [isPaymentInProgress, setIsPaymentInProgress] = useState(false);
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState<PaymentStatus>(
+    'pending'
+  );
   const submitPayment = (
     e: FormEvent<HTMLFormElement> | MouseEvent<HTMLElement>
   ) => {
     e.preventDefault();
+    setIsPaymentSuccess('pending');
     if (selectedUser) {
       fetch(`${SERVER_URL}/payments`, {
         method: 'POST',
@@ -36,7 +42,7 @@ export default function Payment({ selectedUser }: PaymentProps) {
           // from payment app. See payment-app/src/public/pay-form.js
           // @ts-ignore
           window.PMNTS.loadPinForm(data?.paymentSessionKey);
-
+          setIsPaymentInProgress(true);
           while (true) {
             const queryParam = new URLSearchParams({
               paymentSessionKey: data?.paymentSessionKey,
@@ -54,11 +60,15 @@ export default function Payment({ selectedUser }: PaymentProps) {
               console.error(error.message);
               throw error;
             });
-            const { paymentStatus } = await payStatusResp.json();
+            const {
+              paymentStatus,
+            }: { paymentStatus: PaymentStatus } = await payStatusResp.json();
 
             console.log('paymentStatus:', paymentStatus);
 
             if (paymentStatus !== 'pending') {
+              setIsPaymentInProgress(false);
+              setIsPaymentSuccess(paymentStatus);
               break;
             }
 
@@ -92,6 +102,30 @@ export default function Payment({ selectedUser }: PaymentProps) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
+          </Col>
+          <Col xs={6} md={6}>
+            {isPaymentInProgress && (
+              <>
+                <Spinner
+                  className="mt-4 mr-4"
+                  animation="border"
+                  variant="info"
+                />
+                <Badge variant="info" className="mt-4">
+                  Payment processing...
+                </Badge>
+              </>
+            )}
+            {isPaymentSuccess === 'success' && (
+              <Badge variant="success" className="mt-4">
+                Payment success!
+              </Badge>
+            )}
+            {isPaymentSuccess === 'failed' && (
+              <Badge variant="danger" className="mt-4">
+                Payment failed!
+              </Badge>
+            )}
           </Col>
         </Form.Group>
       </Form>
