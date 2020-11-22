@@ -8,29 +8,6 @@ interface PaymentProps {
   selectedUser: string;
 }
 
-const pay = (paymentSessionKey: string) => {
-  const gatewayUrl = 'http://localhost:4000';
-  const params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=600,height=300,left=100,top=100`;
-  const form = document.createElement('form');
-  form.target = 'Payment';
-  form.method = 'POST';
-  form.action = gatewayUrl;
-  form.style.display = 'none';
-
-  const input = document.createElement('input');
-  input.type = 'hidden';
-  input.name = 'paymentSessionKey';
-  input.value = paymentSessionKey;
-  form.appendChild(input);
-
-  document.body.appendChild(form);
-
-  const paymentWindow = window.open('', 'Payment', params);
-  if (paymentWindow) {
-    form.submit();
-  }
-};
-
 export default function Payment({ selectedUser }: PaymentProps) {
   const authState = useAuthState();
   const [amount, setAmount] = useState<string>('10');
@@ -56,8 +33,9 @@ export default function Payment({ selectedUser }: PaymentProps) {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          // setMessages(data);
-          pay(data?.paymentSessionKey);
+          // from payment app. See payment-app/src/public/pay-form.js
+          // @ts-ignore
+          window.PMNTS.loadPinForm(data?.paymentSessionKey);
 
           while (true) {
             const queryParam = new URLSearchParams({

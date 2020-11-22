@@ -4,8 +4,8 @@
   "compilerOptions": {
     "assets": [
       "**/*.hbs",
-      "**/.env"
-    ],
-    "watchAssets": true
+      "**/*.env",
+      "**/*.js"
+    ]
   }
 }
