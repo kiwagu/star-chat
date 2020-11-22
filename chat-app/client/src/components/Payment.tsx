@@ -8,25 +8,20 @@ interface PaymentProps {
   selectedUser: string;
 }
 
-const pay = () => {
+const pay = (paymentSessionKey: string) => {
+  const gatewayUrl = 'http://localhost:4000';
   const params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=600,height=300,left=100,top=100`;
   const form = document.createElement('form');
   form.target = 'Payment';
   form.method = 'POST';
-  form.action = 'http://localhost:4000';
+  form.action = gatewayUrl;
   form.style.display = 'none';
 
   const input = document.createElement('input');
   input.type = 'hidden';
-  input.name = 'secretKey';
-  input.value = 'someSecret123';
+  input.name = 'paymentSessionKey';
+  input.value = paymentSessionKey;
   form.appendChild(input);
-
-  const input2 = document.createElement('input');
-  input2.type = 'hidden';
-  input2.name = 'someParam';
-  input2.value = 'SomeValue';
-  form.appendChild(input2);
 
   document.body.appendChild(form);
 
@@ -62,8 +57,37 @@ export default function Payment({ selectedUser }: PaymentProps) {
             return Promise.reject(error);
           }
           // setMessages(data);
-          pay();
-          /* CONSOLE DEBUG TOREMOVE */ /* prettier-ignore */ console.log("==LOG==\n", "data:", typeof data, "↴\n", data, "\n==END==\n")
+          pay(data?.paymentSessionKey);
+
+          while (true) {
+            const queryParam = new URLSearchParams({
+              paymentSessionKey: data?.paymentSessionKey,
+            }).toString();
+            const payStatusResp: Response | void = await fetch(
+              `${SERVER_URL}/payments/check-status?${queryParam}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authState?.credentials?.accessToken}`,
+                },
+              }
+            ).catch((error) => {
+              console.error(error.message);
+              throw error;
+            });
+            const { paymentStatus } = await payStatusResp.json();
+
+            console.log('paymentStatus:', paymentStatus);
+
+            if (paymentStatus !== 'pending') {
+              break;
+            }
+
+            await(async () => {
+              await new Promise((resolve) => setTimeout(resolve, 2500));
+            })();
+          }
         })
         .catch((errors) => {
           console.error(errors);
@@ -75,14 +99,14 @@ export default function Payment({ selectedUser }: PaymentProps) {
     <div>
       <Form onSubmit={submitPayment}>
         <Form.Group className="d-flex justify-content-start">
-          <Col xs={2} md={1}>
+          <Col xs={2} md={2}>
             <i
               className="fas fa-money-bill-alt mt-4 fa-2x text-primary ml-2"
               onClick={submitPayment}
               role="button"
             ></i>
           </Col>
-          <Col xs={4} md={3}>
+          <Col xs={4} md={4}>
             <Form.Control
               type="number"
               className="message-input p-4 mt-3 rounded-pill bg-secondary border-0"

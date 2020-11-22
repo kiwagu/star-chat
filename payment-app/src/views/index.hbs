@@ -1,11 +1,11 @@
 <h1>Welcome to LocalBank!</h1>
-<h6>{{ message }}</h6>
 <form action="/transfers/pin" method="POST">
   <div class="form-group">
-    <label for="pinInput">Please, provide PIN</label>
-    <input type="number" name="pinInput" class="form-control" id="pinInput" placeholder="PIN" maxlength="4"
+    <label for="pin">Please, provide PIN</label>
+    <input type="number" name="pin" class="form-control" id="pin" placeholder="PIN" maxlength="4"
       value="1234">
-    <input type="hidden" name="secretKey" value="someSecretValue">
+    <input type="hidden" name="paymentSessionKey" value="{{ paymentSessionKey }}">
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+<p class="text-muted pt-4">Control sum: {{ checkSum }}</p>

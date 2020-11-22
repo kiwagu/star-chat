@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
+import * as crypto from 'crypto';
+
 import { CreateTransferDto } from './dto/create-transfer.dto';
-import { UpdateTransferDto } from './dto/update-transfer.dto';
+import { PaymentStatus, Transfer } from './entities/transfer.entity';
 
 @Injectable()
 export class TransfersService {
+  private transfers: Transfer[] = [];
+
   create(createTransferDto: CreateTransferDto) {
-    return 'This action adds a new transfer';
+    const paymentSessionKey = crypto.randomBytes(20).toString('hex');
+    this.transfers.push({
+      paymentSessionKey,
+      status: 'pending',
+      ...createTransferDto,
+    });
+
+    return { paymentSessionKey };
   }
 
-  findAll() {
-    return `This action returns all transfers`;
+  calcChecksum(sessionKey: string) {
+    const checkSum = sessionKey.replace(/[a-z]+/g, '');
+    return checkSum;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transfer`;
+  setStatus(paymentSessionKey: string, status: PaymentStatus) {
+    this.transfers.forEach((transfer) => {
+      if (transfer.paymentSessionKey === paymentSessionKey) {
+        transfer.status = status;
+      }
+    });
   }
 
-  update(id: number, updateTransferDto: UpdateTransferDto) {
-    return `This action updates a #${id} transfer`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transfer`;
+  getStatus(paymentSessionKey: string) {
+    return this.transfers.find(
+      (transfer) =>
+        transfer.paymentSessionKey === paymentSessionKey && transfer.status,
+    );
   }
 }

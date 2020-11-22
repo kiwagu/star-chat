@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { PaymentsService } from './payments.service';
-import { PaymentsController } from './payments.controller';
+import { HttpModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+
+import { PaymentsController } from './payments.controller';
 
 @Module({
   imports: [
@@ -17,8 +17,8 @@ import { PassportModule } from '@nestjs/passport';
         expiresIn: process.env.EXPIRESIN,
       },
     }),
+    HttpModule,
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService],
 })
 export class PaymentsModule {}

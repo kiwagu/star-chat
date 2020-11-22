@@ -121,28 +121,32 @@ export default function Messages({ selectedUser }: MessagesProps) {
             </Fragment>
           ))
         ) : (
-          <p>Messages</p>
+          <p className="text-center">
+            {selectedUser ? 'Messages' : 'Select user'}
+          </p>
         )}
       </div>
-      <div>
-        <Form onSubmit={submitMessage}>
-          <Form.Group className="d-flex align-items-center">
-            <Form.Control
-              type="text"
-              className="message-input p-4 mt-3 rounded-pill bg-secondary border-0"
-              placeholder="Type a message..."
-              value={messageContent}
-              onChange={(e) => setMessageContent(e.target.value)}
-            />
-            <i
-              className="fas fa-paper-plane mt-3 fa-2x text-primary ml-2"
-              onClick={submitMessage}
-              role="button"
-            ></i>
-          </Form.Group>
-        </Form>
-        <Payment selectedUser={selectedUser} />
-      </div>
+      {selectedUser && (
+        <div>
+          <Form onSubmit={submitMessage}>
+            <Form.Group className="d-flex align-items-center">
+              <Form.Control
+                type="text"
+                className="message-input p-4 mt-3 rounded-pill bg-secondary border-0"
+                placeholder="Type a message..."
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
+              />
+              <i
+                className="fas fa-paper-plane mt-3 fa-2x text-primary ml-2"
+                onClick={submitMessage}
+                role="button"
+              ></i>
+            </Form.Group>
+          </Form>
+          <Payment selectedUser={selectedUser} />
+        </div>
+      )}
     </Col>
   );
 }
