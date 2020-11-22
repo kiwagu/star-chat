@@ -2,6 +2,7 @@ import { HttpModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
+import { UsersModule } from '../users/users.module';
 import { PaymentsController } from './payments.controller';
 
 @Module({
@@ -18,6 +19,7 @@ import { PaymentsController } from './payments.controller';
       },
     }),
     HttpModule,
+    UsersModule,
   ],
   controllers: [PaymentsController],
 })

@@ -21,4 +21,16 @@ export class UsersController {
       },
     });
   }
+
+  @Get('current')
+  @UseGuards(AuthGuard())
+  user(@Request() req: Req) {
+    const currentUser = req.user as UserDto;
+
+    return this.usersService.findOne({
+      where: {
+        id: currentUser.id,
+      },
+    });
+  }
 }

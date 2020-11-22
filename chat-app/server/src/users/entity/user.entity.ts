@@ -43,6 +43,14 @@ export class UserEntity {
   })
   email?: string;
 
+  cardNumber = '4242 4242 4242 4242';
+
+  cardName = 'John Smith';
+
+  cardExpiry = '1123';
+
+  cardCvc = '737';
+
   @BeforeInsert() async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
   }

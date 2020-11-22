@@ -23,4 +23,16 @@ export class UserDto {
 
   @IsEmail()
   readonly email?: string;
+
+  @IsString()
+  readonly cardNumber?: string;
+
+  @IsString()
+  readonly cardName?: string;
+
+  @IsString()
+  readonly cardExpiry?: string;
+
+  @IsString()
+  readonly cardCvc?: string;
 }

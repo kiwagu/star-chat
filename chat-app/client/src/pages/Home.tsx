@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { SERVER_URL } from '../consts';
-import { useAuthDispatch } from '../context/auth';
+import { useAuthDispatch, useAuthState } from '../context/auth';
 import Messages from '../components/Messages';
 
 /* eslint-disable-next-line */
@@ -24,7 +24,8 @@ export default function Home(props: HomeProps) {
     authDispatch({ type: 'LOGOUT' });
     window.location.href = '/login';
   };
-  const accessToken = localStorage.getItem('accessToken');
+  const authState = useAuthState();
+  const accessToken = authState.credentials?.accessToken || '';
   const [users, setUsers] = useState<UserDto[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
 
@@ -60,6 +61,7 @@ export default function Home(props: HomeProps) {
         })}
         key={user.username}
         onClick={() => setSelectedUser(user.id)}
+        role="button"
       >
         <p>
           {user.firstName && user.lastName
